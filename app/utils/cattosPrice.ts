@@ -69,7 +69,9 @@ async function fetchFromAptoscan(): Promise<number | null> {
       
       console.warn(`⚠️ Invalid response structure on attempt ${attempt + 1}`);
     } catch (error) {
-      console.warn(`❌ Aptoscan attempt ${attempt + 1} failed:`, error.code || error.message);
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      const errorCode = error && typeof error === 'object' && 'code' in error ? (error as { code: string }).code : undefined;
+      console.warn(`❌ Aptoscan attempt ${attempt + 1} failed:`, errorCode || errorMsg);
       
       // If this is not the last attempt, wait before retrying
       if (attempt < maxRetries - 1) {
