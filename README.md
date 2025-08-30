@@ -1,22 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cryptocurrency Price Tracker - APT, USDT, CATTOS
 
-## Getting Started
+A Next.js 15 application that tracks real-time cryptocurrency prices for:
+- **APT to USDT** (Aptos to Tether)
+- **USDT to PHP** (Tether to Philippine Peso)  
+- **APT to CATTOS** (Aptos to CATTOS tokens in the Aptos ecosystem)
 
-First, run the development server:
+## ✨ Key Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- 🚀 **Real-time Updates**: Prices automatically refresh every minute
+- 🔄 **No Page Reloads**: Smooth client-side updates using React state
+- 📱 **Responsive Design**: Modern UI with Tailwind CSS
+- 🔄 **Auto-refresh**: Manual refresh button and automatic updates
+- 📊 **Multiple Data Sources**: CoinGecko API + Aptos ecosystem APIs
+- 🏥 **Health Monitoring**: API endpoint health checks
+- ⚡ **Next.js 15**: Built with the latest Next.js features
+- 🎯 **Smooth UX**: Hover effects, loading states, and visual feedback
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎯 No Page Reload Implementation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The application is designed to provide a seamless user experience:
+
+- **Client-side State Management**: Uses React hooks for smooth state updates
+- **API-only Updates**: Only fetches new data, doesn't reload the entire page
+- **Visual Feedback**: Shows loading indicators during updates
+- **Automatic Refresh**: Updates every minute in the background
+- **Manual Refresh**: Button to manually fetch latest prices
+
+### How It Works
+
+1. **Initial Load**: Page loads once with initial prices
+2. **Background Updates**: JavaScript fetches new data every minute
+3. **State Updates**: React state updates trigger UI re-renders
+4. **Smooth Transitions**: No page flicker or reload delays
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
