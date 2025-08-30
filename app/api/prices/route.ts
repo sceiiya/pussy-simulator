@@ -10,6 +10,20 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 export async function GET(request: Request) {
   try {
+    // Skip external API calls during build/static generation
+    if (process.env.NEXT_PHASE === 'phase-production-build') {
+      console.log('🏗️ Build phase detected in API route, returning mock data');
+      return NextResponse.json({
+        aptToUsdt: 4.27,
+        usdtToPhp: 57.1,
+        aptToCattos: 5305.67,
+        selectedCurrency: DEFAULT_CURRENCY,
+        selectedCurrencyToUsdt: 57.1,
+        aptToSelectedCurrency: 243.87,
+        lastUpdated: new Date().toISOString(),
+      });
+    }
+
     const { searchParams } = new URL(request.url);
     const selectedCurrency = searchParams.get('currency') || DEFAULT_CURRENCY;
     

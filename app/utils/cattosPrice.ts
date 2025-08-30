@@ -11,6 +11,15 @@ const CATTOS_TOKEN_INFO = {
 
 export async function fetchCattosPriceFromDEX(): Promise<number | null> {
   try {
+    // Check if we're in a build environment (static generation phase)
+    const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' || 
+                       (typeof window === 'undefined' && !process.env.VERCEL_URL);
+    
+    if (isBuildTime) {
+      console.log('🏗️ Build environment detected, skipping external API calls');
+      return null;
+    }
+
     // Primary source: Aptoscan API for real CATTOS token data
     const price = await fetchFromAptoscan();
     if (price !== null) {
@@ -29,22 +38,33 @@ export async function fetchCattosPriceFromDEX(): Promise<number | null> {
 // Primary source: Aptoscan API for real CATTOS token data with retries
 async function fetchFromAptoscan(): Promise<number | null> {
   const maxRetries = 3;
-  const timeouts = [5000, 8000, 12000]; // Progressive timeout increase
+  const timeouts = [10000, 15000, 25000]; // Progressive timeout increase for Vercel builds
   
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
       console.log(`Fetching CATTOS price from Aptoscan API (attempt ${attempt + 1}/${maxRetries})...`);
       
+      // Rotate user agents to avoid blocking
+      const userAgents = [
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      ];
+      
       const response = await axios.get(CATTOS_TOKEN_INFO.aptoscanEndpoint, {
         timeout: timeouts[attempt],
         headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'application/json, text/plain, */*',
+          'User-Agent': userAgents[attempt % userAgents.length],
           'Accept-Language': 'en-US,en;q=0.9',
           'Accept-Encoding': 'gzip, deflate, br',
           'Connection': 'keep-alive',
-          'Upgrade-Insecure-Requests': '1',
           'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+          'DNT': '1',
+          'Sec-Fetch-Dest': 'empty',
+          'Sec-Fetch-Mode': 'cors',
+          'Sec-Fetch-Site': 'cross-site',
         },
       });
 
@@ -110,14 +130,19 @@ export async function calculateAptToCattosRatio(): Promise<number | null> {
 
     // Fetch CATTOS price from Aptoscan (USDT per 1 CATTOS)
     const cattosResponse = await axios.get(CATTOS_TOKEN_INFO.aptoscanEndpoint, {
-      timeout: 10000,
+      timeout: 20000, // Increased timeout for Vercel builds
       headers: {
-        'Accept': 'application/json',
+        'Accept': 'application/json, text/plain, */*',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept-Language': 'en-US,en;q=0.9',
         'Accept-Encoding': 'gzip, deflate, br',
         'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'DNT': '1',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'cross-site',
       },
     });
 

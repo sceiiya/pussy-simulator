@@ -74,6 +74,23 @@ export async function fetchCattosPrice(): Promise<number | null> {
 
 export async function fetchAllPrices(selectedCurrency: string = DEFAULT_CURRENCY): Promise<CryptoPrices> {
   try {
+    // Check if we're in a build environment (static generation phase)
+    const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' || 
+                       (typeof window === 'undefined' && !process.env.VERCEL_URL);
+    
+    if (isBuildTime) {
+      console.log('🏗️ Build environment detected, returning mock data');
+      return {
+        aptToUsdt: 4.27,
+        usdtToPhp: selectedCurrency === 'php' ? 57.1 : null,
+        aptToCattos: 5305.67,
+        selectedCurrency,
+        selectedCurrencyToUsdt: selectedCurrency === 'php' ? 57.1 : 1.0,
+        aptToSelectedCurrency: selectedCurrency === 'php' ? 243.87 : 4.27,
+        lastUpdated: new Date().toISOString(),
+      };
+    }
+
     console.log('🚀 Fetching all cryptocurrency prices...');
     
     // Fetch CoinGecko prices (APT/USDT, APT/selectedCurrency, and selectedCurrency/USDT)
