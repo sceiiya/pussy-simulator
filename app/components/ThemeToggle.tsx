@@ -1,51 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useTheme } from './ThemeProvider';
 
 export default function ThemeToggle() {
-  const [isDark, setIsDark] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const { theme, toggleTheme, isLoaded } = useTheme();
 
-  useEffect(() => {
-    setMounted(true);
-    
-    // Check for saved theme preference or system preference
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-    
-    setIsDark(shouldBeDark);
-    
-    // Apply theme to document
-    if (shouldBeDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    
-    // Save preference to localStorage
-    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
-    
-    // Apply theme to document
-    if (newTheme) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  };
-
-  // Prevent hydration mismatch
-  if (!mounted) {
+  // Prevent hydration mismatch by showing placeholder until loaded
+  if (!isLoaded) {
     return (
-      <div className="fixed top-4 right-4 z-50 p-3 bg-white rounded-full shadow-lg border border-gray-200 w-12 h-12"></div>
+      <div className="fixed top-4 right-4 z-50 p-3 bg-white rounded-full shadow-lg border border-gray-200 w-12 h-12 flex items-center justify-center">
+        <div className="w-6 h-6 bg-gray-300 rounded-full animate-pulse"></div>
+      </div>
     );
   }
+
+  const isDark = theme === 'dark';
 
   return (
     <button
